@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjxxt.mapper.StudentMapper">
+  <resultMap id="BaseResultMap" type="com.yjxxt.bean.Student">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="student_name" jdbcType="VARCHAR" property="studentName" />
+    <result column="student_pwd" jdbcType="VARCHAR" property="studentPwd" />
+    <result column="qq" jdbcType="VARCHAR" property="qq" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="phone" jdbcType="VARCHAR" property="phone" />
+    <result column="create_date" jdbcType="DATE" property="createDate" />
+    <result column="update_date" jdbcType="DATE" property="updateDate" />
+    <result column="is_valid" jdbcType="INTEGER" property="isValid" />
+    <result column="c_id" jdbcType="INTEGER" property="cId" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, student_name, student_pwd, qq, sex, phone, create_date, update_date, is_valid, 
+    c_id
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from t_student
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_student
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yjxxt.bean.Student">
+    insert into t_student (id, student_name, student_pwd, 
+      qq, sex, phone, create_date, 
+      update_date, is_valid, c_id
+      )
+    values (#{id,jdbcType=INTEGER}, #{studentName,jdbcType=VARCHAR}, #{studentPwd,jdbcType=VARCHAR}, 
+      #{qq,jdbcType=VARCHAR}, #{sex,jdbcType=VARCHAR}, #{phone,jdbcType=VARCHAR}, #{createDate,jdbcType=DATE}, 
+      #{updateDate,jdbcType=DATE}, #{isValid,jdbcType=INTEGER}, #{cId,jdbcType=INTEGER}
+      )
+  </insert>
+  <insert id="insertSelective" parameterType="com.yjxxt.bean.Student">
+    insert into t_student
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="studentName != null">
+        student_name,
+      </if>
+      <if test="studentPwd != null">
+        student_pwd,
+      </if>
+      <if test="qq != null">
+        qq,
+      </if>
+      <if test="sex != null">
+        sex,
+      </if>
+      <if test="phone != null">
+        phone,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="isValid != null">
+        is_valid,
+      </if>
+      <if test="cId != null">
+        c_id,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="studentName != null">
+        #{studentName,jdbcType=VARCHAR},
+      </if>
+      <if test="studentPwd != null">
+        #{studentPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="qq != null">
+        #{qq,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=DATE},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=DATE},
+      </if>
+      <if test="isValid != null">
+        #{isValid,jdbcType=INTEGER},
+      </if>
+      <if test="cId != null">
+        #{cId,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yjxxt.bean.Student">
+    update t_student
+    <set>
+      <if test="studentName != null">
+        student_name = #{studentName,jdbcType=VARCHAR},
+      </if>
+      <if test="studentPwd != null">
+        student_pwd = #{studentPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="qq != null">
+        qq = #{qq,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        sex = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null">
+        phone = #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=DATE},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=DATE},
+      </if>
+      <if test="isValid != null">
+        is_valid = #{isValid,jdbcType=INTEGER},
+      </if>
+      <if test="cId != null">
+        c_id = #{cId,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yjxxt.bean.Student">
+    update t_student
+    set student_name = #{studentName,jdbcType=VARCHAR},
+      student_pwd = #{studentPwd,jdbcType=VARCHAR},
+      qq = #{qq,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      phone = #{phone,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=DATE},
+      update_date = #{updateDate,jdbcType=DATE},
+      is_valid = #{isValid,jdbcType=INTEGER},
+      c_id = #{cId,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <!--  根据名字查询学生-->
+  <select id="selectStudentByName" resultType="com.yjxxt.bean.Student">
+    select * from t_student
+    <where>
+      <if test="studentName!=null and studentName!=''">
+        student_name=#{studentName }
+      </if>
+    </where>
+  </select>
+  <!--查询所有的学生-->
+  <select id="selectStudent" resultType="java.util.Map">
+    select * from t_student
+  </select>
+  <!--学生条件查询-->
+  <select id="selectByParams" parameterType="StudentQuery" resultType="com.yjxxt.bean.Student">
+    select * from t_student as s
+    <where>
+      s.is_valid=1
+      <if test="studentName!=null and studentName!=''">
+        and student_name like concat("%",#{studentName},"%")
+      </if>
+      <if test="cId!=null and cId!=''">
+        and c_id = #{cId }
+      </if>
+      <if test="isValid!=null and isValid!=''">
+        and is_valid = #{isValid}
+      </if>
+    </where>
+  </select>
+  <select id="queryStudentByStudentName" resultType="com.yjxxt.bean.Student">
+      select
+      <include refid="Base_Column_List"/>
+      from t_student where student_name=#{sname}
+  </select>
+
+  <!--统计当前学生的数量-->
+  <select id="countStudentNum" resultType="java.lang.Integer">
+    select count(*) from t_student where id=#{studentId}
+  </select>
+
+  <!--删除学生的信息-->
+  <update id="deleteBatch">
+    update t_student
+    set is_valid=0
+    <where>
+      <foreach collection="array" open="id in(" close=")" separator="," item="id">
+        #{id }
+      </foreach>
+    </where>
+  </update>
+
+</mapper>

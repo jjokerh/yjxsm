@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.yjxxt.mapper.StageMapper">
+    <resultMap id="BaseResultMap" type="com.yjxxt.bean.Stage">
+        <id column="id" property="id" jdbcType="INTEGER"/>
+        <result column="stage_name" property="stageName" jdbcType="VARCHAR"/>
+        <result column="is_valid" property="isValid" jdbcType="INTEGER"/>
+        <result column="create_date" property="createDate" jdbcType="DATE"/>
+        <result column="update_date" property="updateDate" jdbcType="DATE"/>
+        <result column="period" property="period" jdbcType="INTEGER"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+        id, stage_name, is_valid, create_date, update_date, period
+    </sql>
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer">
+        select
+        <include refid="Base_Column_List"/>
+        from t_stage
+        where id = #{id,jdbcType=INTEGER}
+    </select>
+
+    <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+        delete
+        from t_stage
+        where id = #{id,jdbcType=INTEGER}
+    </delete>
+    <insert id="insert" parameterType="com.yjxxt.bean.Stage">
+        insert into t_stage (id, stage_name, is_valid,
+                             create_date, update_date, period)
+        values (#{id,jdbcType=INTEGER}, #{stageName,jdbcType=VARCHAR}, #{isValid,jdbcType=INTEGER},
+                #{createDate,jdbcType=DATE}, #{updateDate,jdbcType=DATE}, #{period,jdbcType=INTEGER})
+    </insert>
+    <insert id="insertSelective" parameterType="com.yjxxt.bean.Stage">
+        insert into t_stage
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="stageName != null">
+                stage_name,
+            </if>
+            <if test="isValid != null">
+                is_valid,
+            </if>
+            <if test="createDate != null">
+                create_date,
+            </if>
+            <if test="updateDate != null">
+                update_date,
+            </if>
+            <if test="period != null">
+                period,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=INTEGER},
+            </if>
+            <if test="stageName != null">
+                #{stageName,jdbcType=VARCHAR},
+            </if>
+            <if test="isValid != null">
+                #{isValid,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null">
+                #{createDate,jdbcType=DATE},
+            </if>
+            <if test="updateDate != null">
+                #{updateDate,jdbcType=DATE},
+            </if>
+            <if test="period != null">
+                #{period,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+    <update id="updateByPrimaryKeySelective" parameterType="com.yjxxt.bean.Stage">
+        update t_stage
+        <set>
+            <if test="stageName != null">
+                stage_name = #{stageName,jdbcType=VARCHAR},
+            </if>
+            <if test="isValid != null">
+                is_valid = #{isValid,jdbcType=INTEGER},
+            </if>
+            <if test="createDate != null">
+                create_date = #{createDate,jdbcType=DATE},
+            </if>
+            <if test="updateDate != null">
+                update_date = #{updateDate,jdbcType=DATE},
+            </if>
+            <if test="period != null">
+                period = #{period,jdbcType=INTEGER},
+            </if>
+        </set>
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.yjxxt.bean.Stage">
+        update t_stage
+        set stage_name  = #{stageName,jdbcType=VARCHAR},
+            is_valid    = #{isValid,jdbcType=INTEGER},
+            create_date = #{createDate,jdbcType=DATE},
+            update_date = #{updateDate,jdbcType=DATE},
+            period      = #{period,jdbcType=INTEGER}
+        where id = #{id,jdbcType=INTEGER}
+    </update>
+
+    <!--查询所有的阶段课程-->
+    <select id="selectStage" resultType="java.util.Map">
+        select id,stage_name from t_stage
+        <where>
+            <if test="id!=null and id!=''">
+                id=#{id }
+            </if>
+        </where>
+    </select>
+
+    <!--  根据课程名查课程-->
+    <select id="selectStageByName" resultType="java.lang.Integer">
+        select s.id
+        from t_stage as s
+        where s.stage_name = #{stageName}
+          and is_valid = 1
+    </select>
+    <!--查询所有课程-->
+    <select id="selectAllStage" resultType="com.yjxxt.bean.Stage">
+        SELECT
+        s.*,
+        t.teacher_name
+        FROM
+        t_stage as s left
+        JOIN t_teacher_stage as ts ON s.id = ts.stage_id
+        JOIN t_teacher as t ON ts.teacher_id = t.id
+        WHERE
+        s.is_valid = 1
+        <if test="id!=null and id!= ''">
+            and s.id = #{id}
+        </if>
+        <if test="stageName!=null and stageName!=''">
+            and s.stage_name like concat('%',#{stageName},'%')
+        </if>
+        <if test="teacherName!=null and teacherName!=''">
+            and t.teacher_name like concat('%',#{teacherName},'%')
+        </if>
+    </select>
+    <!--  名称查询-->
+    <select id="selectStageName" resultType="java.lang.Integer">
+        select s.id
+        from t_stage s
+        where s.stage_name = #{stageName}
+          and is_valid = 1
+    </select>
+    <!--查询所有老师-->
+    <select id="selectAllTeacher" resultType="java.util.Map">
+        select t.id id, t.teacher_name teacherName
+        from t_teacher as t
+                 left join t_teacher_role as tr on t.id = tr.teacher_id
+                 left join t_role r on r.id = tr.role_id
+        where r.role_name = "teacher"
+    </select>
+    <!--查询所有阶段老师-->
+
+    <!--  插入选择老师-->
+    <insert id="insertTeacherStage">
+        insert into t_teacher_stage (stage_id, teacher_id, create_date, update_date)
+        values (#{param1}, #{param2}, #{param3}, #{param4});
+    </insert>
+    <!--更新老师课程-->
+    <update id="updateTeacher">
+        update t_teacher_stage as t
+        set t.teacher_id=#{gettId},
+            t.update_date=#{date}
+        where t.stage_id = #{id}
+    </update>
+    <!--  批量删除-->
+    <update id="deleteBatch">
+        update t_stage
+        set
+        is_valid=0
+        <where>
+            id in
+            <foreach collection="array" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+        </where>
+    </update>
+
+    <select id="findSC" resultType="java.util.Map">
+        SELECT t.stage_name cname,
+               DATEDIFF(
+                       t.update_date,
+                       t.create_date
+                   )        td,
+               COUNT(s.id)  stusum
+        FROM t_stage t
+                 LEFT JOIN t_student_stage sc ON t.id = sc.stage_id
+                 LEFT JOIN t_student s ON s.id = sc.student_id
+        GROUP BY t.id
+    </select>
+    <select id="selectStudentStage" resultType="java.util.Map">
+        select t.id, t.stage_name name, COUNT(s.id) value
+        from t_stage t
+                 left join t_student_stage sc on t.id = sc.stage_id
+                 left join t_student s on sc.student_id = s.id
+        GROUP BY t.id
+    </select>
+    <select id="findAll" resultType="java.util.Map">
+        select *
+        from t_stage
+        where is_valid = 1
+    </select>
+    <select id="selectAllStageTeacher" resultType="com.yjxxt.bean.Stage">
+        select st.*, t.id as t_id, t.teacher_name
+        from t_stage as st
+                 left join t_teacher_stage as ts on st.id = ts.stage_id
+                 left join t_teacher t on ts.teacher_id = t.id
+        where st.id = #{id}
+    </select>
+</mapper>

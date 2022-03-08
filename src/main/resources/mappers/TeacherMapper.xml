@@ -1,0 +1,402 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.yjxxt.mapper.TeacherMapper">
+  <resultMap id="BaseResultMap" type="com.yjxxt.bean.Teacher">
+    <id column="id" jdbcType="INTEGER" property="id" />
+    <result column="teacher_name" jdbcType="VARCHAR" property="teacherName" />
+    <result column="teacher_pwd" jdbcType="VARCHAR" property="teacherPwd" />
+    <result column="sex" jdbcType="VARCHAR" property="sex" />
+    <result column="create_date" jdbcType="DATE" property="createDate" />
+    <result column="update_date" jdbcType="DATE" property="updateDate" />
+    <result column="is_valid" jdbcType="INTEGER" property="isValid" />
+  </resultMap>
+  <sql id="Base_Column_List">
+    id, teacher_name, teacher_pwd, sex, create_date, update_date, is_valid
+  </sql>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Integer" resultMap="BaseResultMap">
+    SELECT
+      t.id,t.teacher_name,t.sex,t.email,t.address,t.phone,t.create_date,t.update_date, tz.clazz_name as clazzName,tr.id as roleid,tz.id as clazzid, tr.role_name as roleName
+    FROM
+      t_teacher t
+        LEFT JOIN t_teacher_class ttc ON t.id = ttc.teacher_id
+        LEFT JOIN t_clazz tz ON ttc.clazz_id = tz.id
+        LEFT JOIN t_teacher_role ttr ON t.id = ttr.teacher_id
+        LEFT JOIN t_role tr ON ttr.role_id = tr.id
+    where t.id = #{id}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer">
+    delete from t_teacher
+    where id = #{id,jdbcType=INTEGER}
+  </delete>
+  <insert id="insert" parameterType="com.yjxxt.bean.Teacher">
+    insert into t_teacher (id, teacher_name, teacher_pwd, 
+      sex, create_date, update_date, 
+      is_valid)
+    values (#{id,jdbcType=INTEGER}, #{teacherName,jdbcType=VARCHAR}, #{teacherPwd,jdbcType=VARCHAR}, 
+      #{sex,jdbcType=VARCHAR}, #{createDate,jdbcType=DATE}, #{updateDate,jdbcType=DATE}, 
+      #{isValid,jdbcType=INTEGER})
+  </insert>
+  <insert id="insertSelective" parameterType="com.yjxxt.bean.Teacher">
+    insert into t_teacher
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        id,
+      </if>
+      <if test="teacherName != null">
+        teacher_name,
+      </if>
+      <if test="teacherPwd != null">
+        teacher_pwd,
+      </if>
+      <if test="sex != null">
+        sex,
+      </if>
+      <if test="createDate != null">
+        create_date,
+      </if>
+      <if test="updateDate != null">
+        update_date,
+      </if>
+      <if test="isValid != null">
+        is_valid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="id != null">
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="teacherName != null">
+        #{teacherName,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherPwd != null">
+        #{teacherPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        #{createDate,jdbcType=DATE},
+      </if>
+      <if test="updateDate != null">
+        #{updateDate,jdbcType=DATE},
+      </if>
+      <if test="isValid != null">
+        #{isValid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.yjxxt.bean.Teacher">
+    update t_teacher
+    <set>
+      <if test="teacherName != null">
+        teacher_name = #{teacherName,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherPwd != null">
+        teacher_pwd = #{teacherPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null">
+        sex = #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null">
+        create_date = #{createDate,jdbcType=DATE},
+      </if>
+      <if test="updateDate != null">
+        update_date = #{updateDate,jdbcType=DATE},
+      </if>
+      <if test="isValid != null">
+        is_valid = #{isValid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.yjxxt.bean.Teacher">
+    update t_teacher
+    set teacher_name = #{teacherName,jdbcType=VARCHAR},
+      teacher_pwd = #{teacherPwd,jdbcType=VARCHAR},
+      sex = #{sex,jdbcType=VARCHAR},
+      create_date = #{createDate,jdbcType=DATE},
+      update_date = #{updateDate,jdbcType=DATE},
+      is_valid = #{isValid,jdbcType=INTEGER}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+
+  <select id="queryTeacherByTeacherName" resultType="com.yjxxt.bean.Teacher">
+            select tea.*,
+               r.role_name roleName
+        FROM t_teacher tea
+                 JOIN t_teacher_role tr ON tea.id = tr.teacher_id
+                 join t_role r on tr.role_id = r.id
+        where teacher_name = #{tname}
+  </select>
+  <!--多条件查询-->
+  <select id="selectByParams" parameterType="TeacherQuery" resultType="Teacher">
+    SELECT
+    t.id,t.teacher_name,t.sex,t.email,t.address,t.phone,t.create_date,t.update_date, tz.clazz_name,tr.role_name
+    FROM
+    t_teacher t
+    LEFT JOIN t_teacher_class ttc ON t.id = ttc.teacher_id
+    LEFT JOIN t_clazz tz ON ttc.clazz_id = tz.id
+    LEFT JOIN t_teacher_role ttr ON t.id = ttr.teacher_id
+    LEFT JOIN t_role tr ON ttr.role_id = tr.id
+    <where>
+      and t.is_valid=1
+      <if test="teacherName!=null and teacherName!=''">
+        and t.teacher_name like "%${teacherName}%"
+      </if>
+      <if test="roleName!=null and roleName!=''">
+        and tr.role_name = #{roleName}
+      </if>
+      <if test="sex!=null and sex!=''">
+        and t.sex = #{sex}
+      </if>
+      <if test="id!=null and id!=''">
+        and t.id = #{id}
+      </if>
+    </where>
+  </select>
+  <!--根据用户名查询用户对象-->
+  <select id="selectTeacherByName" resultType="com.yjxxt.bean.Teacher">
+    select * from t_teacher where teacher_name = #{teacherName}
+  </select>
+
+
+  <!--添加教师信息,开启自动增长列-->
+  <insert id="insertHasKey" parameterType="Teacher" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+    insert into t_teacher
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="teacherName != null" >
+        teacher_name,
+      </if>
+      <if test="teacherPwd != null" >
+        teacher_pwd,
+      </if>
+      <if test="phone != null" >
+        phone,
+      </if>
+      <if test="address != null" >
+        address,
+      </if>
+      <if test="sex != null" >
+        sex,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="isValid != null" >
+        is_valid,
+      </if>
+      <if test="email != null" >
+        email,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="teacherName != null" >
+        #{teacherName,jdbcType=VARCHAR},
+      </if>
+      <if test="teacherPwd != null" >
+        #{teacherPwd,jdbcType=VARCHAR},
+      </if>
+      <if test="phone != null" >
+        #{phone,jdbcType=VARCHAR},
+      </if>
+      <if test="address != null" >
+        #{address,jdbcType=VARCHAR},
+      </if>
+      <if test="sex != null" >
+        #{sex,jdbcType=VARCHAR},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=DATE},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=DATE},
+      </if>
+      <if test="isValid != null" >
+        #{isValid,jdbcType=INTEGER},
+      </if>
+      <if test="email != null" >
+        #{email,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+  <!--给教师分配班级-->
+  <insert id="insertclass" parameterType="teacherClass" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+    insert into t_teacher_class
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="teacherId != null" >
+        teacher_id,
+      </if>
+      <if test="clazzId != null" >
+        clazz_id,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="teacherId != null" >
+        #{teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="clazzId != null" >
+        #{clazzId,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=DATE},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=DATE},
+      </if>
+    </trim>
+  </insert>
+  <!--给老师分配职位-->
+  <insert id="insertrole" parameterType="teacherClass" keyProperty="id" keyColumn="id" useGeneratedKeys="true">
+    insert into t_teacher_role
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="teacherId != null" >
+        teacher_id,
+      </if>
+      <if test="roleId != null" >
+        role_id,
+      </if>
+      <if test="createDate != null" >
+        create_date,
+      </if>
+      <if test="updateDate != null" >
+        update_date,
+      </if>
+      <if test="isValid != null" >
+        is_valid,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="teacherId != null" >
+        #{teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="roleId != null" >
+        #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        #{createDate,jdbcType=DATE},
+      </if>
+      <if test="updateDate != null" >
+        #{updateDate,jdbcType=DATE},
+      </if>
+      <if test="isValid != null" >
+        #{isValid,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+  <!--批量删除-->
+  <update id="deleteBatch">
+    update t_teacher
+    set is_valid=0
+    <where>
+      id in
+      <foreach collection="array" open="  (" close=")" separator="," item="id">
+        #{id}
+      </foreach>
+    </where>
+  </update>
+
+  <!--修改老师分配的班级-->
+  <update id="updateByTeacherClass" parameterType="teacherClass">
+    update t_teacher_class
+    <set >
+      <if test="teacherId != null" >
+        teacher_id = #{teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="clazzId != null" >
+        clazz_id = #{clazzId,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=DATE},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=DATE},
+      </if>
+    </set>
+    where teacher_id = #{teacherId,jdbcType=INTEGER}
+  </update>
+
+  <!--修改老师分配的职位-->
+  <update id="updateByTeacherRole" parameterType="teacherRole">
+    update t_teacher_role
+    <set >
+      <if test="teacherId != null" >
+        teacher_id = #{teacherId,jdbcType=INTEGER},
+      </if>
+      <if test="roleId != null" >
+        role_id = #{roleId,jdbcType=INTEGER},
+      </if>
+      <if test="createDate != null" >
+        create_date = #{createDate,jdbcType=DATE},
+      </if>
+      <if test="updateDate != null" >
+        update_date = #{updateDate,jdbcType=DATE},
+      </if>
+      <if test="isValid != null" >
+        is_valid = #{isValid,jdbcType=INTEGER},
+      </if>
+    </set>
+    where teacher_id = #{teacherId,jdbcType=INTEGER}
+
+  </update>
+
+  <!--查询老师职位-->
+  <select id="queryAllRoles" resultType="java.util.Map">
+    SELECT
+      id,role_name as roleName
+    FROM
+      t_role
+    WHERE
+      NOT role_name = '学生'
+  </select>
+  <!--查询老师班级-->
+  <select id="queryAllClazz" resultType="java.util.Map">
+    SELECT
+      id,
+      clazz_name as clazzName
+    FROM
+      t_clazz
+  </select>
+
+  <!--删除老师带班级的信息-->
+  <delete id="deleteTeacherClass" >
+    delete from t_teacher_class
+    where teacher_id=#{teacherId}
+  </delete>
+
+  <!--删除老师任职位信息-->
+  <delete id="deleteTeacherRole">
+    delete from t_teacher_role
+    where teacher_id=#{teacherId}
+  </delete>
+
+
+</mapper>
